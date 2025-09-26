@@ -24,20 +24,23 @@ proc casutil;
     promote;
 run;
 
-/* This code creates a new table with the required VERTEX_ORDER column */
-data Public.DISTRICTS_FOR_PROVIDER (promote=yes);
+/* This code creates a new table with a NUMERIC district ID and the sequence column */
+data Public.DISTRICTS_FOR_PROVIDER (promote=yes drop=DISTRICT rename=(DISTRICT_NUM=DISTRICT));
     set Public.CONGRESS_DISTRICTS;
-    by DISTRICT SEGMENT; /* This groups the data by each unique polygon part */
+    by DISTRICT SEGMENT;
+
+    /* Convert the original text DISTRICT to a number */
+    DISTRICT_NUM = input(DISTRICT, 8.); 
     
-    /* For the first vertex of each part, reset the counter to 1 */
+    /* Create the vertex order sequence */
     if first.SEGMENT then VERTEX_ORDER = 1;
-    /* For all other vertices, increment the counter */
     else VERTEX_ORDER + 1;
 run;
-
 proc casutil;
     save casdata="DISTRICTS_FOR_PROVIDER" /* The in-memory table to save */
     incaslib="Public"                   /* Where to find the in-memory table */
     outcaslib="Public"                  /* Where to save the physical file */
     replace;                            /* Overwrite if it already exists */
 run;
+
+
