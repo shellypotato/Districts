@@ -34,3 +34,10 @@ data Public.DISTRICTS_FOR_PROVIDER (promote=yes);
     /* For all other vertices, increment the counter */
     else VERTEX_ORDER + 1;
 run;
+
+proc casutil;
+    save casdata="DISTRICTS_FOR_PROVIDER" /* The in-memory table to save */
+    incaslib="Public"                   /* Where to find the in-memory table */
+    outcaslib="Public"                  /* Where to save the physical file */
+    replace;                            /* Overwrite if it already exists */
+run;
